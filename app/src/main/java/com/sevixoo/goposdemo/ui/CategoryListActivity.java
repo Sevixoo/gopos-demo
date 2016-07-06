@@ -1,7 +1,9 @@
-package com.sevixoo.goposdemo;
+package com.sevixoo.goposdemo.ui;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.sevixoo.goposdemo.R;
 
 public class CategoryListActivity extends AppCompatActivity {
 

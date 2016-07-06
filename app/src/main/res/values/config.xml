@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="label_authenticator">GoPOS</string>
+
+    <string name="config_category_token_type">category_token</string>
+    <string name="config_account_type">com.sevixoo.goposdemo</string>
+
+
+
+</resources>
