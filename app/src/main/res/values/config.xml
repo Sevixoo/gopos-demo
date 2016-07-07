@@ -3,9 +3,10 @@
 
     <string name="label_authenticator">GoPOS</string>
 
-    <string name="config_category_token_type">category_token</string>
+    <string name="config_category_token_type">bearer</string>
     <string name="config_account_type">com.sevixoo.goposdemo</string>
-
-
+    <string name="config_api_base_url">http://demo.gopos.pl</string>
+    <string name="config_api_client_id">06dff5d1-07b1-40f9-80bd-625db272f8da</string>
+    <string name="config_api_client_sacred">b5847be0-caf5-483f-a234-757977fa7f37</string>
 
 </resources>

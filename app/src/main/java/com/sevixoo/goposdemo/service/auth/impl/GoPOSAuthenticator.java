@@ -1,4 +1,4 @@
-package com.sevixoo.goposdemo.service.auth;
+package com.sevixoo.goposdemo.service.auth.impl;
 
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.sevixoo.goposdemo.domain.entity.SignUpCredentials;
+import com.sevixoo.goposdemo.domain.service.IAuthenticateService;
 import com.sevixoo.goposdemo.ui.LoginActivity;
 
 /**
@@ -21,12 +23,14 @@ public class GoPOSAuthenticator extends AbstractAccountAuthenticator {
     private String TAG = "GoPOSAuthenticator";
 
     private IAuthenticateService        mAuthenticateService;
-    private AccountConfig               mAccountConfig;
+    private AccountConfig mAccountConfig;
     private final Context               mContext;
 
-    public GoPOSAuthenticator(Context context) {
+    public GoPOSAuthenticator( Context context, AccountConfig accountConfig, IAuthenticateService authenticateService) {
         super(context);
         mContext = context;
+        mAuthenticateService = authenticateService;
+        mAccountConfig = accountConfig;
     }
 
     @Override
@@ -53,7 +57,6 @@ public class GoPOSAuthenticator extends AbstractAccountAuthenticator {
         final AccountManager am = AccountManager.get(mContext);
 
         String authToken = am.peekAuthToken(account, authTokenType);
-
         Log.d("sevixoo", TAG + "> peekAuthToken returned - " + authToken);
 
         // Lets give another try to authenticate the user
@@ -62,7 +65,8 @@ public class GoPOSAuthenticator extends AbstractAccountAuthenticator {
             if (password != null) {
                 try {
                     Log.d("sevixoo", TAG + "> re-authenticating with the existing password");
-                    authToken = mAuthenticateService.userSignIn(account.name, password, authTokenType);
+                    SignUpCredentials credentials = mAuthenticateService.userSignInBlocking(account.name, password, authTokenType,mAccountConfig.getAccountType()  );
+                    authToken = credentials.authToken;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
