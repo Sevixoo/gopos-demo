@@ -11,7 +11,7 @@ import rx.Subscriber;
 /**
  * Created by Seweryn on 2016-07-06.
  */
-public class UserSignUpInteractor extends Interactor {
+public class UserSignInInteractor extends Interactor {
 
     private IAuthenticateService    mAuthenticateService;
     private String                  mLogin;
@@ -19,9 +19,10 @@ public class UserSignUpInteractor extends Interactor {
     private String                  mTokenType;
     private String                  mAccountType;
 
-    public UserSignUpInteractor( IAuthenticateService authenticateService, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
+    public UserSignInInteractor(String accountType, IAuthenticateService authenticateService, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
         super(threadExecutor, postExecutionThread);
         mAuthenticateService = authenticateService;
+        mAccountType = accountType;
     }
 
     @Override
@@ -29,11 +30,10 @@ public class UserSignUpInteractor extends Interactor {
         return mAuthenticateService.userSignIn(mLogin,mPassword,mTokenType,mAccountType);
     }
 
-    public void execute(String login , String password , String tokenType, String accountType, Subscriber UseCaseSubscriber) {
+    public void execute(String login , String password , String tokenType, Subscriber UseCaseSubscriber) {
         mLogin = login;
         mPassword = password;
         mTokenType = tokenType;
-        mAccountType = accountType;
         super.execute(UseCaseSubscriber);
     }
 }

@@ -5,11 +5,15 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sevixoo.goposdemo.GoPOSApplication;
 import com.sevixoo.goposdemo.R;
+import com.sevixoo.goposdemo.component.CategoryListComponent;
 import com.sevixoo.goposdemo.service.auth.impl.AccountConfig;
 import com.sevixoo.goposdemo.ui.presenter.ICategoryPresenter;
 import com.sevixoo.goposdemo.ui.view.ICategoryView;
@@ -22,8 +26,7 @@ public class CategoryListActivity extends AppCompatActivity implements ICategory
 
     private final int REQ_SIGN_IN = 1;
 
-    @Inject
-    public ICategoryPresenter mCategoryPresenter;
+    public static ICategoryPresenter mCategoryPresenter;
 
     @Inject
     public AccountConfig        mAccountConfig;
@@ -35,10 +38,38 @@ public class CategoryListActivity extends AppCompatActivity implements ICategory
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category_list);
         ButterKnife.bind(this);
-        GoPOSApplication.get(this).getCategoryListComponent(this).inject(this);
+
+        CategoryListComponent component = GoPOSApplication.get(this).getCategoryListComponent();
+        component.inject(this);
+
+        if(mCategoryPresenter==null){
+            mCategoryPresenter = component.getCategoryPresenter();
+        }
+
+        mCategoryPresenter.setView(this);
 
         if(savedInstanceState==null){
             mCategoryPresenter.checkLogin();
+        }
+
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.categoty_activity_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.logout:
+                mCategoryPresenter.onClickLogout();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 

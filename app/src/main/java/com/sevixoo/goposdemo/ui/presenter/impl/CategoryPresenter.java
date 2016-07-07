@@ -17,9 +17,8 @@ public class CategoryPresenter implements ICategoryPresenter {
     CheckAuthorizationInteractor        mCheckAuthorizationInteractor;
     AccountConfig                       mAccountConfig;
 
-    public CategoryPresenter(ICategoryView categoryView,AccountConfig accountConfig, CheckAuthorizationInteractor checkAuthorizationInteractor) {
+    public CategoryPresenter( AccountConfig accountConfig, CheckAuthorizationInteractor checkAuthorizationInteractor) {
         mCheckAuthorizationInteractor = checkAuthorizationInteractor;
-        mCategoryView = categoryView;
         mAccountConfig = accountConfig;
     }
 
@@ -40,11 +39,22 @@ public class CategoryPresenter implements ICategoryPresenter {
 
     @Override
     public void checkLogin() {
+        Log.e( "checkLogin" , "checkLogin" );
         mCategoryView.showScreenLoader();
         mCheckAuthorizationInteractor.execute(
                 mAccountConfig.getCategoryTokenType(),
                 new CheckLoginSubscriber()
         );
+    }
+
+    @Override
+    public void setView(ICategoryView categoryView) {
+        mCategoryView = categoryView;
+    }
+
+    @Override
+    public void onClickLogout() {
+        Log.e( "onClickLogout" , "onClickLogout" );
     }
 
     private class CheckLoginSubscriber extends DefaultSubscriber<String>{

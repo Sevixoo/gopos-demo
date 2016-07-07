@@ -55,21 +55,21 @@ public class GoPOSApplication extends Application {
                 .build();
     }
 
-    public LoginComponent getLoginComponent(ILoginView loginView, boolean canAddAccount){
+    public LoginComponent getLoginComponent( boolean canAddAccount){
         return DaggerLoginComponent.builder()
                 .appModule(mAppModule)
                 .rESTApiModule(mRESTApiModule)
                 .authModule(mAuthModule)
-                .loginModule(new LoginModule(this,loginView,canAddAccount))
+                .loginModule(new LoginModule(this, canAddAccount))
                 .build();
     }
 
-    public CategoryListComponent getCategoryListComponent(ICategoryView categoryView){
+    public CategoryListComponent getCategoryListComponent(){
         return DaggerCategoryListComponent.builder()
                 .appModule(mAppModule)
                 .rESTApiModule(mRESTApiModule)
                 .authModule(mAuthModule)
-                .categoryListModule(new CategoryListModule(this,categoryView))
+                .categoryListModule(new CategoryListModule(this))
                 .build();
     }
 

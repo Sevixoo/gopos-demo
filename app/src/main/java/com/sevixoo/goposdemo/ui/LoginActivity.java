@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.sevixoo.goposdemo.GoPOSApplication;
 import com.sevixoo.goposdemo.R;
+import com.sevixoo.goposdemo.component.LoginComponent;
 import com.sevixoo.goposdemo.domain.entity.SignUpCredentials;
 import com.sevixoo.goposdemo.ui.presenter.ILoginPresenter;
 import com.sevixoo.goposdemo.ui.view.ILoginView;
@@ -48,19 +49,19 @@ public class LoginActivity extends AccountAuthenticatorActivity implements ILogi
         return intent;
     }
 
-    @Inject
-    public ILoginPresenter     mLoginPresenter;
-    private String              mAuthTokenType;
+    public static ILoginPresenter   mLoginPresenter;
+
+    private String                  mAuthTokenType;
 
     @BindView(R.id.accountName)
-    public EditText            mAccountNameEditText;
+    public EditText                 mAccountNameEditText;
 
     @BindView(R.id.accountPassword)
-    public EditText            mAccountPasswordEditText;
+    public EditText                 mAccountPasswordEditText;
 
-    private String              mAccountType;
-    private ProgressDialog      mProgressDialog;
-    private boolean             mIsAddingAccount;
+    private String                  mAccountType;
+    private ProgressDialog          mProgressDialog;
+    private boolean                 mIsAddingAccount;
 
 
     @Override
@@ -74,11 +75,23 @@ public class LoginActivity extends AccountAuthenticatorActivity implements ILogi
         mAuthTokenType = getIntent().getStringExtra(ARG_AUTH_TYPE);
         mIsAddingAccount = getIntent().getBooleanExtra(ARG_IS_ADDING_NEW_ACCOUNT, false);
 
+        //tests
+        mAccountNameEditText.setText( "test@gmail.com" );
+        mAccountPasswordEditText.setText( "test2016" );
+
         if (accountName != null) {
             mAccountNameEditText.setText(accountName);
         }
 
-        GoPOSApplication.get(this).getLoginComponent(this,mIsAddingAccount).inject(this);
+        LoginComponent component = GoPOSApplication.get(this).getLoginComponent( mIsAddingAccount);
+        //component.inject(this);
+
+        if( mLoginPresenter == null ){
+            mLoginPresenter = component.getLoginPresenter();
+        }
+
+        mLoginPresenter.setView( this );
+
     }
 
     @OnClick(R.id.submit)
@@ -116,8 +129,6 @@ public class LoginActivity extends AccountAuthenticatorActivity implements ILogi
     @Override
     public void displayLoginError(String error) {
         Toast toast = Toast.makeText(this, error, Toast.LENGTH_SHORT);
-        TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
-        v.setTextColor(Color.RED);
         toast.show();
     }
 

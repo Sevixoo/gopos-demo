@@ -1,5 +1,7 @@
 package com.sevixoo.goposdemo.service.auth.impl;
 
+import android.util.Log;
+
 import com.sevixoo.goposdemo.domain.entity.SignUpCredentials;
 import com.sevixoo.goposdemo.domain.exceptions.RESTApiException;
 import com.sevixoo.goposdemo.domain.service.IAuthenticateService;
@@ -44,7 +46,14 @@ public class AuthenticateService implements IAuthenticateService{
                     params.put( "client_secret" , mClientSecret );
                     params.put( "grant_type" , "password" );
 
+                    try{
+                        Thread.sleep(300);
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+
                     Response<SuccessAuthorizationResponse> resp = mGoPOSWebService.authorization( params ).execute();
+                    Log.d( "response" , resp.message() );
                     if( resp.isSuccessful() ){
                         SuccessAuthorizationResponse response = resp.body();
                         SignUpCredentials credentials = new SignUpCredentialsMapper().transform( response );

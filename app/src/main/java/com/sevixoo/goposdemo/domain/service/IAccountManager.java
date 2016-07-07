@@ -15,4 +15,10 @@ public interface IAccountManager {
 
     Observable<String> getAuthToken(final String authTokenType);
 
+    Observable<String> invalidateAuthToken(final String authTokenType);
+
+    Observable<String> destroyAccount( String accountName );
+
+    Observable<SignUpCredentials> getUserData( String accountName );
+
 }

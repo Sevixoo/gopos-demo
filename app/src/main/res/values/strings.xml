@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">goposDemo</string>
+    <string name="title_logout">Logout</string>
 </resources>

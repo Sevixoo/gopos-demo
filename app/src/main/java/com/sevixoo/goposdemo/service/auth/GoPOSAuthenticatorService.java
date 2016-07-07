@@ -17,7 +17,9 @@ public class GoPOSAuthenticatorService extends Service {
     @Inject
     AbstractAccountAuthenticator mAuthenticator;
 
-    public GoPOSAuthenticatorService() {
+    @Override
+    public void onCreate() {
+        super.onCreate();
         GoPOSApplication.get(this).getAuthComponent().inject(this);
     }
 

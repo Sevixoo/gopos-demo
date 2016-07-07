@@ -4,6 +4,7 @@ import android.accounts.Account;
 import android.accounts.AccountManagerFuture;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.sevixoo.goposdemo.domain.entity.SignUpCredentials;
 import com.sevixoo.goposdemo.domain.exceptions.AccountManagerException;
@@ -31,11 +32,18 @@ public class AccountManager implements IAccountManager {
             @Override
             public void call(Subscriber<? super SignUpCredentials> subscriber) {
                 try {
+                    Log.e( "createAccount" , "createAccount" );
+                    Log.e( "createAccount" , "accountType" + credentials.accountType );
+                    Log.e( "createAccount" , "login" + credentials.login );
                     Account account = new Account(credentials.login, credentials.accountType );
-                    mAccountManager.addAccountExplicitly(account, credentials.password, null);
-                    mAccountManager.setAuthToken(account, credentials.tokenType , credentials.authToken );
-                    subscriber.onNext(credentials);
-                    subscriber.onCompleted();
+                    boolean ret = mAccountManager.addAccountExplicitly(account, credentials.password, null);
+                    if(!ret){
+                        subscriber.onError( new AccountManagerException("Error adding account") );
+                    }else {
+                        mAccountManager.setAuthToken(account, credentials.tokenType, credentials.authToken);
+                        subscriber.onNext(credentials);
+                        subscriber.onCompleted();
+                    }
                 } catch (Exception e) {
                     subscriber.onError( new AccountManagerException(e.getCause()) );
                 }
@@ -73,9 +81,10 @@ public class AccountManager implements IAccountManager {
 
                     Bundle bnd = future.getResult();
                     final String authtoken = bnd.getString(android.accounts.AccountManager.KEY_AUTHTOKEN);
-                    if(!TextUtils.isEmpty(authtoken)){
+                    if(TextUtils.isEmpty(authtoken)){
                         subscriber.onError( new AccountManagerException() );
                     }else {
+                        Log.d( "AccountManager" , "getAuthToken().authtoken=" + authtoken );
                         subscriber.onNext(authtoken);
                         subscriber.onCompleted();
                     }
@@ -86,30 +95,37 @@ public class AccountManager implements IAccountManager {
         });
     }
 
+    @Override
+    public Observable<String> invalidateAuthToken( final String authTokenType ) {
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                try {
+                    Account[] accounts = mAccountManager.getAccountsByType( mAccountConfig.getAccountType() );
+                    Account account = accounts[0];
+                    final AccountManagerFuture<Bundle> future =
+                            mAccountManager.getAuthToken(account, authTokenType, null, true, null, null);
 
-
-    /*public void getAuthToken(  ){
-        Bundle options = new Bundle();
-
-        am.getAuthToken(
-                myAccount_,                     // Account retrieved using getAccountsByType()
-                "Manage your tasks",            // Auth scope
-                options,                        // Authenticator-specific options
-                this,                           // Your activity
-                new OnTokenAcquired(),          // Callback called when a token is successfully acquired
-                new Handler(new OnError()));    // Callback called if an error occurs
+                    Bundle bnd = future.getResult();
+                    final String authtoken = bnd.getString(android.accounts.AccountManager.KEY_AUTHTOKEN);
+                    mAccountManager.invalidateAuthToken(account.type, authtoken);
+                    subscriber.onNext(authtoken);
+                    subscriber.onCompleted();
+                } catch (Exception e) {
+                    subscriber.onError( new AccountManagerException(e.getCause()) );
+                }
+            }
+        });
     }
 
-    private class OnTokenAcquired implements AccountManagerCallback<Bundle> {
-        @Override
-        public void run(AccountManagerFuture<Bundle> result) {
-            // Get the result of the operation from the AccountManagerFuture.
-            Bundle bundle = result.getResult();
+    @Override
+    public Observable<String> destroyAccount(String accountName) {
+        return null;
+    }
 
-            // The token is a named value in the bundle. The name of the value
-            // is stored in the constant AccountManager.KEY_AUTHTOKEN.
-            token = bundle.getString(AccountManager.KEY_AUTHTOKEN);
-        }
-    }*/
+    @Override
+    public Observable<SignUpCredentials> getUserData(String accountName) {
+        return null;
+    }
 
 }

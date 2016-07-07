@@ -1,5 +1,7 @@
 package com.sevixoo.goposdemo.domain.interactor;
 
+import android.util.Log;
+
 import com.sevixoo.goposdemo.domain.Interactor;
 import com.sevixoo.goposdemo.domain.entity.SignUpCredentials;
 import com.sevixoo.goposdemo.domain.executor.PostExecutionThread;
@@ -27,8 +29,10 @@ public class CreateAccountInteractor extends Interactor {
     @Override
     protected Observable buildUseCaseObservable() {
         if(mCanAddAccount){
+            Log.e( "buildUseCaseObservable" , "createAccount" );
             return mAccountManager.createAccount( mCredentials );
         }else{
+            Log.e( "buildUseCaseObservable" , "updateCredentials" );
             return mAccountManager.updateCredentials( mCredentials );
         }
     }
@@ -36,6 +40,7 @@ public class CreateAccountInteractor extends Interactor {
     public void execute(boolean canAddAccount, SignUpCredentials credentials, Subscriber UseCaseSubscriber) {
         mCanAddAccount = canAddAccount;
         mCredentials = credentials;
+        Log.e("canAddAccount" , " " + canAddAccount);
         super.execute(UseCaseSubscriber);
     }
 }

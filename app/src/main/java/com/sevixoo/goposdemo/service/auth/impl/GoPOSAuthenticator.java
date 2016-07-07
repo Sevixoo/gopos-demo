@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.sevixoo.goposdemo.domain.entity.SignUpCredentials;
 import com.sevixoo.goposdemo.domain.service.IAuthenticateService;
@@ -23,7 +24,7 @@ public class GoPOSAuthenticator extends AbstractAccountAuthenticator {
     private String TAG = "GoPOSAuthenticator";
 
     private IAuthenticateService        mAuthenticateService;
-    private AccountConfig mAccountConfig;
+    private AccountConfig               mAccountConfig;
     private final Context               mContext;
 
     public GoPOSAuthenticator( Context context, AccountConfig accountConfig, IAuthenticateService authenticateService) {
@@ -35,6 +36,13 @@ public class GoPOSAuthenticator extends AbstractAccountAuthenticator {
 
     @Override
     public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options) throws NetworkErrorException {
+        Account[] accounts = AccountManager.get(mContext).getAccountsByType( accountType );
+        if( accounts.length > 0 ){
+            final Bundle bundle = new Bundle();
+            bundle.putString(AccountManager.KEY_ERROR_MESSAGE, "Only one account can exist");
+            return bundle;
+        }
+
         final Intent intent = new Intent(mContext, LoginActivity.class);
         intent.putExtra(LoginActivity.ARG_ACCOUNT_TYPE, accountType);
         intent.putExtra(LoginActivity.ARG_AUTH_TYPE, authTokenType);
