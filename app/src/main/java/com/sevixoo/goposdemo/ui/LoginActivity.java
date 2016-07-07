@@ -121,6 +121,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements ILogi
     public void showProgressLoader() {
         if(mProgressDialog==null){
             mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setMessage("Loading...");
             mProgressDialog.setCancelable(false);
         }
         mProgressDialog.show();

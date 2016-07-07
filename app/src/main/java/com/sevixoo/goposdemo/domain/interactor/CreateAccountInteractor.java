@@ -23,16 +23,13 @@ public class CreateAccountInteractor extends Interactor {
     public CreateAccountInteractor(IAccountManager mAccountManager, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
         super(threadExecutor, postExecutionThread);
         this.mAccountManager = mAccountManager;
-
     }
 
     @Override
     protected Observable buildUseCaseObservable() {
         if(mCanAddAccount){
-            Log.e( "buildUseCaseObservable" , "createAccount" );
             return mAccountManager.createAccount( mCredentials );
         }else{
-            Log.e( "buildUseCaseObservable" , "updateCredentials" );
             return mAccountManager.updateCredentials( mCredentials );
         }
     }
@@ -40,7 +37,6 @@ public class CreateAccountInteractor extends Interactor {
     public void execute(boolean canAddAccount, SignUpCredentials credentials, Subscriber UseCaseSubscriber) {
         mCanAddAccount = canAddAccount;
         mCredentials = credentials;
-        Log.e("canAddAccount" , " " + canAddAccount);
         super.execute(UseCaseSubscriber);
     }
 }

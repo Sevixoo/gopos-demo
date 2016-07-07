@@ -10,4 +10,5 @@ public interface ICategoryPresenter extends IBasicPresenter {
     void checkLogin();
     void setView(ICategoryView view);
     void onClickLogout();
+    void loadCategories(int offset);
 }

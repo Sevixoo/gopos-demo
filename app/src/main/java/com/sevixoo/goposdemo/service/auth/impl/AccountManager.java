@@ -1,7 +1,9 @@
 package com.sevixoo.goposdemo.service.auth.impl;
 
 import android.accounts.Account;
+import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -119,12 +121,54 @@ public class AccountManager implements IAccountManager {
     }
 
     @Override
-    public Observable<String> destroyAccount(String accountName) {
+    public Observable<String> destroyAccount(final String accountName) {
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(final Subscriber<? super String> subscriber) {
+                try {
+                    Account account = getAccountByName(accountName);
+                    if(account==null) {
+                        subscriber.onError( new AccountManagerException("Account not found") );
+                    }
+
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1){
+                        AccountManagerFuture<Bundle> future =mAccountManager.removeAccount(account , null, null , null );
+                        future.getResult();
+                    }else{
+                        AccountManagerFuture<Boolean> future = mAccountManager.removeAccount(account, null , null );
+                        future.getResult();
+                    }
+                    subscriber.onNext("");
+                    subscriber.onCompleted();
+
+                } catch (Exception e) {
+                    subscriber.onError( new AccountManagerException(e.getCause()) );
+                }
+            }
+        });
+    }
+
+    private Account getAccountByName(String accountName){
+        Account[] accounts = mAccountManager.getAccountsByType( mAccountConfig.getAccountType() );
+        for(Account account : accounts){
+            if(account.name.equals(accountName)){
+                return account;
+            }
+        }
         return null;
     }
 
     @Override
     public Observable<SignUpCredentials> getUserData(String accountName) {
+        return null;
+    }
+
+    @Override
+    public String getLoggedAccountName() {
+        Account[] accounts = mAccountManager.getAccountsByType( mAccountConfig.getAccountType() );
+        if(accounts!=null&&accounts.length>0){
+            return accounts[0].name;
+        }
         return null;
     }
 

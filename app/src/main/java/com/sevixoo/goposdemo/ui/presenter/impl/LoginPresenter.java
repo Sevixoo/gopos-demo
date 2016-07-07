@@ -23,7 +23,6 @@ public class LoginPresenter implements ILoginPresenter {
         this.mUserSignUpInteractor = userSignUpInteractor;
         this.mCreateAccountInteractor = mCreateAccountInteractor;
         this.canAddAccount = canAddAccount;
-        Log.e("LoginPresenter","LoginPresenter");
     }
 
     @Override
@@ -51,7 +50,6 @@ public class LoginPresenter implements ILoginPresenter {
     private class LoginSubscriber extends DefaultSubscriber<SignUpCredentials>{
         @Override
         public void onNext(SignUpCredentials res) {
-            Log.e( "LoginSubscriber" , "onNext" );
             mCreateAccountInteractor.execute( canAddAccount , res , new CreateAccountSubscriber() );
         }
         @Override

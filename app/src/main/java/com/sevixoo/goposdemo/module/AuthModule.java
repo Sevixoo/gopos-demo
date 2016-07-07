@@ -8,6 +8,7 @@ import com.sevixoo.goposdemo.domain.executor.PostExecutionThread;
 import com.sevixoo.goposdemo.domain.executor.ThreadExecutor;
 import com.sevixoo.goposdemo.domain.interactor.CheckAuthorizationInteractor;
 import com.sevixoo.goposdemo.domain.interactor.CreateAccountInteractor;
+import com.sevixoo.goposdemo.domain.interactor.DeleteAccountInteractor;
 import com.sevixoo.goposdemo.domain.interactor.UserSignInInteractor;
 import com.sevixoo.goposdemo.domain.service.IAccountManager;
 import com.sevixoo.goposdemo.domain.service.IAuthenticateService;
@@ -80,6 +81,11 @@ public class AuthModule {
     @Provides
     public CheckAuthorizationInteractor providesCheckAuthorizationInteractor(IAccountManager accountManager ,ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread){
         return new CheckAuthorizationInteractor(accountManager , threadExecutor , postExecutionThread );
+    }
+
+    @Provides
+    public DeleteAccountInteractor provideDeleteAccountInteractor(IAccountManager accountManager ,ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread){
+        return new DeleteAccountInteractor(accountManager , threadExecutor , postExecutionThread);
     }
 
 }

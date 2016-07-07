@@ -1,12 +1,14 @@
 package com.sevixoo.goposdemo.module;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 
 import com.sevixoo.goposdemo.domain.interactor.CheckAuthorizationInteractor;
+import com.sevixoo.goposdemo.domain.interactor.DeleteAccountInteractor;
 import com.sevixoo.goposdemo.service.auth.impl.AccountConfig;
+import com.sevixoo.goposdemo.ui.adapter.CategoriesRecyclerAdapter;
 import com.sevixoo.goposdemo.ui.presenter.ICategoryPresenter;
 import com.sevixoo.goposdemo.ui.presenter.impl.CategoryPresenter;
-import com.sevixoo.goposdemo.ui.view.ICategoryView;
 
 import dagger.Module;
 import dagger.Provides;
@@ -24,8 +26,13 @@ public class CategoryListModule {
     }
 
     @Provides
-    public ICategoryPresenter provideLoginPresenter( AccountConfig config , CheckAuthorizationInteractor checkAuthorizationInteractor){
-        return new CategoryPresenter( config , checkAuthorizationInteractor );
+    public ICategoryPresenter provideLoginPresenter(AccountConfig config , DeleteAccountInteractor deleteAccountInteractor, CheckAuthorizationInteractor checkAuthorizationInteractor){
+        return new CategoryPresenter( config ,deleteAccountInteractor, checkAuthorizationInteractor );
+    }
+
+    @Provides
+    public CategoriesRecyclerAdapter provideCategoryAdapter(){
+        return new CategoriesRecyclerAdapter();
     }
 
 }

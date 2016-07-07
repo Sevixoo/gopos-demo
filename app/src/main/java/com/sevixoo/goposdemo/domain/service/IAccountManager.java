@@ -21,4 +21,6 @@ public interface IAccountManager {
 
     Observable<SignUpCredentials> getUserData( String accountName );
 
+    String getLoggedAccountName();
+
 }
