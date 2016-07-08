@@ -28,6 +28,11 @@ public class CategoriesRecyclerAdapter extends RecyclerView.Adapter<BaseViewHold
         notifyItemRangeInserted( mDataList.size() - data.size()  , mDataList.size() );
     }
 
+    public void clear(){
+        mDataList.clear();
+        notifyDataSetChanged();
+    }
+
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_category, parent, false);

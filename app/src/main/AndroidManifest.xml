@@ -7,6 +7,9 @@
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.READ_SYNC_STATS"/>
 
     <application
         android:name=".GoPOSApplication"
@@ -34,7 +37,27 @@
                 android:resource="@xml/authenticator" />
         </service>
 
-        <activity android:name=".ui.CategoryDetailsActivity"></activity>
+        <activity android:name=".ui.CategoryDetailsActivity"> </activity>
+
+        <provider
+            android:authorities="com.sevixoo.goposdemo.CATEGORIES"
+            android:name=".data.provider.DummyProvider"
+            android:enabled="true"
+            android:syncable="true"
+            android:label="Categories"
+        />
+
+        <service
+            android:name=".service.sync.CategoriesSyncService"
+            android:exported="true"
+            android:process=":sync">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter"/>
+            </intent-filter>
+            <meta-data android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_adapter_categories" />
+        </service>
+
     </application>
 
 </manifest>

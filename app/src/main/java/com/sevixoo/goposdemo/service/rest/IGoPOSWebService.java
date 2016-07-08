@@ -1,7 +1,10 @@
 package com.sevixoo.goposdemo.service.rest;
 
+import com.sevixoo.goposdemo.domain.entity.CategoryItem;
+import com.sevixoo.goposdemo.service.rest.pojo.CategoryItemsResponse;
 import com.sevixoo.goposdemo.service.rest.pojo.SuccessAuthorizationResponse;
 
+import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -18,6 +21,6 @@ public interface IGoPOSWebService {
     public Call<SuccessAuthorizationResponse> authorization(@QueryMap Map<String, String> options );
 
     @GET("/api/sale/venue/6/productCategory")
-    public Call<String> listCategories(@Query("sort") String access_token );
+    public Call<CategoryItemsResponse> listCategories(@Query("access_token") String access_token );
 
 }

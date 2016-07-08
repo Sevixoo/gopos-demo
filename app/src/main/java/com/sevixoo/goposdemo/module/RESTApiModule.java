@@ -6,9 +6,12 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sevixoo.goposdemo.R;
+import com.sevixoo.goposdemo.domain.entity.CategoryItem;
 import com.sevixoo.goposdemo.domain.service.IAuthenticateService;
 import com.sevixoo.goposdemo.service.auth.impl.AuthenticateService;
 import com.sevixoo.goposdemo.service.rest.IGoPOSWebService;
+import com.sevixoo.goposdemo.service.rest.mapper.CategoryItemDeserializer;
+import com.sevixoo.goposdemo.service.rest.pojo.CategoryItemsResponse;
 
 import javax.inject.Singleton;
 
@@ -38,20 +41,20 @@ public class RESTApiModule {
 
     @Provides
     @Singleton
-    Retrofit provideRetrofit(Gson gson) {
+    Retrofit provideRetrofit( GsonConverterFactory gsonConverterFactory) {
         Retrofit retrofit = new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addConverterFactory(gsonConverterFactory)
                 .baseUrl(mBaseUrl)
                 .build();
         return retrofit;
     }
 
     @Provides
-    @Singleton
-    Gson provideGson() {
+    GsonConverterFactory buildGsonConverter() {
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
-        return gsonBuilder.create();
+        gsonBuilder.registerTypeAdapter(CategoryItemsResponse.class, new CategoryItemDeserializer());
+        Gson myGson = gsonBuilder.create();
+        return GsonConverterFactory.create(myGson);
     }
 
 }

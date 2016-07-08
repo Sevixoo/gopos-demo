@@ -1,5 +1,7 @@
 package com.sevixoo.goposdemo.domain.service;
 
+import android.accounts.Account;
+
 import com.sevixoo.goposdemo.domain.entity.SignUpCredentials;
 
 import rx.Observable;
@@ -22,5 +24,9 @@ public interface IAccountManager {
     Observable<SignUpCredentials> getUserData( String accountName );
 
     String getLoggedAccountName();
+
+    Account getLoggedAccount();
+
+    String getAuthTokenBlocking(final String authTokenType)throws Exception;
 
 }

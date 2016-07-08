@@ -9,4 +9,6 @@
     <string name="config_api_client_id">06dff5d1-07b1-40f9-80bd-625db272f8da</string>
     <string name="config_api_client_sacred">b5847be0-caf5-483f-a234-757977fa7f37</string>
 
+    <string name="config_category_sync_authority">com.sevixoo.goposdemo.CATEGORIES</string>
+
 </resources>

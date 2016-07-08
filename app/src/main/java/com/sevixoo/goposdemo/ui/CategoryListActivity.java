@@ -3,6 +3,7 @@ package com.sevixoo.goposdemo.ui;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,14 +12,18 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sevixoo.goposdemo.GoPOSApplication;
 import com.sevixoo.goposdemo.R;
 import com.sevixoo.goposdemo.component.CategoryListComponent;
+import com.sevixoo.goposdemo.component.SyncComponent;
 import com.sevixoo.goposdemo.domain.entity.CategoryListItem;
 import com.sevixoo.goposdemo.service.auth.impl.AccountConfig;
+import com.sevixoo.goposdemo.service.sync.ISyncHelper;
+import com.sevixoo.goposdemo.service.sync.ISyncReceiver;
 import com.sevixoo.goposdemo.ui.adapter.CategoriesRecyclerAdapter;
 import com.sevixoo.goposdemo.ui.adapter.EndlessRecyclerViewScrollListener;
 import com.sevixoo.goposdemo.ui.adapter.EndlessScrollListener;
@@ -33,7 +38,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class CategoryListActivity extends AppCompatActivity implements ICategoryView , ItemClickSupport.OnItemClickListener{
+public class CategoryListActivity extends AppCompatActivity implements ISyncReceiver.SyncListener , ICategoryView , ItemClickSupport.OnItemClickListener{
 
     private final int REQ_SIGN_IN = 1;
 
@@ -49,6 +54,15 @@ public class CategoryListActivity extends AppCompatActivity implements ICategory
     public  CategoriesRecyclerAdapter   mAdapter;
     private LinearLayoutManager         mLayoutManager;
 
+    @BindView(R.id.swiperefresh)
+    public SwipeRefreshLayout           mSwipeRefreshLayout;
+
+    @BindView(R.id.empty_view)
+    public FrameLayout                  mEmptyView;
+
+    public ISyncHelper                  mSyncHelper;
+    public ISyncReceiver                mSyncReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +70,11 @@ public class CategoryListActivity extends AppCompatActivity implements ICategory
         ButterKnife.bind(this);
 
         CategoryListComponent component = GoPOSApplication.get(this).getCategoryListComponent();
+        SyncComponent sync = GoPOSApplication.get(this).getSyncCategoriesComponent();
         component.inject(this);
+
+        mSyncHelper = sync.getSyncHelper();
+        mSyncReceiver = sync.getSyncReceiver();
 
         mLayoutManager = new LinearLayoutManager(this);
 
@@ -71,6 +89,22 @@ public class CategoryListActivity extends AppCompatActivity implements ICategory
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.addOnScrollListener(new CategoryEndlessScrollListener(mLayoutManager));
         ItemClickSupport.addTo( mRecyclerView ).setOnItemClickListener(this);
+
+        mSyncReceiver.setSyncListener(this);
+
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mSyncHelper.requestSync();
+            }
+        });
+
+        mEmptyView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mSyncHelper.requestSync();
+            }
+        });
 
         if(savedInstanceState==null){
             mCategoryPresenter.checkLogin();
@@ -153,6 +187,11 @@ public class CategoryListActivity extends AppCompatActivity implements ICategory
     @Override
     public void onItemsLoaded(List<CategoryListItem> listItems) {
         mAdapter.pushItems( listItems );
+        if(mAdapter.getItemCount()==0){
+            mEmptyView.setVisibility(View.VISIBLE);
+        }else{
+            mEmptyView.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -166,12 +205,14 @@ public class CategoryListActivity extends AppCompatActivity implements ICategory
     protected void onResume() {
         super.onResume();
         mCategoryPresenter.onResume();
+        mSyncReceiver.onResume(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         mCategoryPresenter.onPause();
+        mSyncReceiver.onPause(this);
     }
 
     @Override
@@ -185,6 +226,24 @@ public class CategoryListActivity extends AppCompatActivity implements ICategory
         CategoryListItem item = mAdapter.getItem(position);
         Intent intent = CategoryDetailsActivity.createIntent(this,item.getID());
         startActivity(intent);
+    }
+
+    @Override
+    public void onSyncStarted() {
+        mSwipeRefreshLayout.setRefreshing(true);
+    }
+
+    @Override
+    public void onSyncFinish() {
+        mSwipeRefreshLayout.setRefreshing(false);
+        mAdapter.clear();
+        mCategoryPresenter.loadCategories(0);
+    }
+
+    @Override
+    public void onSyncError(String message) {
+        mSwipeRefreshLayout.setRefreshing(false);
+        displayError( message );
     }
 
     private class CategoryEndlessScrollListener extends EndlessRecyclerViewScrollListener{
