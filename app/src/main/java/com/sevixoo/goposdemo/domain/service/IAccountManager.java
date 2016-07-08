@@ -27,6 +27,8 @@ public interface IAccountManager {
 
     Account getLoggedAccount();
 
+
+    String invalidateAuthTokenBlocking(final String authTokenType);
     String getAuthTokenBlocking(final String authTokenType)throws Exception;
 
 }

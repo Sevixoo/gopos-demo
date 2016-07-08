@@ -37,7 +37,7 @@ public class GoPOSApplication extends Application {
         mAppModule = new AppModule(this);
         mRESTApiModule = new RESTApiModule(this);
         mAuthModule = new AuthModule(this);
-        //mDataModule = new DataModule(this);
+        mDataModule = new DataModule(this);
     }
 
     public static GoPOSApplication get(Context context){

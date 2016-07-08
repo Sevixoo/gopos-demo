@@ -2,6 +2,7 @@ package com.sevixoo.goposdemo.data.mapper;
 
 import com.sevixoo.goposdemo.data.entity.CategoryEntity;
 import com.sevixoo.goposdemo.domain.entity.CategoryItem;
+import com.sevixoo.goposdemo.domain.entity.CategoryListItem;
 
 /**
  * Created by Seweryn on 2016-07-08.
@@ -25,4 +26,14 @@ public class CategoryItemMapper {
         entity.setTitle(item.getName());
         return entity;
     }
+
+
+    public CategoryListItem transformToListItem(CategoryItem item){
+        CategoryListItem entity = new CategoryListItem();
+        entity.setImagePath(item.getImagePath());
+        entity.setID(item.getID());
+        entity.setName(item.getName());
+        return entity;
+    }
+
 }

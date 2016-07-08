@@ -12,13 +12,13 @@ public class CategoryEntity {
     @DatabaseField(generatedId = true)
     private Long _id;
 
-    @DatabaseField
+    @DatabaseField()
     private String title;
 
     @DatabaseField
     private String imagePath;
 
-    @DatabaseField
+    @DatabaseField(index = true)
     private int remoteId;
 
     public CategoryEntity( ) {

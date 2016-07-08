@@ -52,25 +52,45 @@ public class CategorySyncAdapter extends AbstractThreadedSyncAdapter {
 
         try {
             Thread.sleep(2000);
-
-            String authToken =  mAccountManager.getAuthTokenBlocking( mAccountConfig.getCategoryTokenType() );
-            if(TextUtils.isEmpty(authToken)){
-                syncResult.stats.numAuthExceptions = 1;
-                throw new Exception("Unauthorized");
-            }
-            Response<CategoryItemsResponse> response = mGoPOSWebService.listCategories( authToken ).execute();
-            Log.e("Response" , response.toString() );
-
-            if(response.isSuccessful()){
-                CategoryItemsResponse resp = response.body();
-                for( CategoryItem categoryItem : resp.items ){
-                    Log.e( "CategoryItem" , categoryItem.getName() );
-                    mCategoriesRepository.insert(categoryItem);
-                    syncResult.stats.numInserts++;
+            boolean retry = false;
+            do {
+                retry = false;
+                String authToken = mAccountManager.getAuthTokenBlocking(mAccountConfig.getCategoryTokenType());
+                if (TextUtils.isEmpty(authToken)) {
+                    if(syncResult.stats.numAuthExceptions==0){
+                        retry= true;
+                    }else{
+                        throw new Exception("Unauthorized");
+                    }
+                    syncResult.stats.numAuthExceptions++;
                 }
-            }else{
-                throw new RESTApiException( response.message() );
-            }
+
+                Response<CategoryItemsResponse> response = mGoPOSWebService.listCategories(authToken).execute();
+                Log.d("Response", response.toString());
+
+                if (response.isSuccessful()) {
+                    syncResult.stats.numAuthExceptions = 0;
+                    CategoryItemsResponse resp = response.body();
+                    for (CategoryItem categoryItem : resp.items) {
+                        Log.d("CategoryItem", categoryItem.getName());
+                        CategoryItem item = mCategoriesRepository.getByRemoteID( categoryItem.getRemoteId() );
+                        if(item==null){
+                            mCategoriesRepository.insert(categoryItem);
+                            syncResult.stats.numInserts++;
+                        }
+                    }
+                } else if (response.code() == 401) {
+                    mAccountManager.invalidateAuthTokenBlocking(mAccountConfig.getCategoryTokenType());
+                    if(syncResult.stats.numAuthExceptions==0){
+                        retry = true;
+                    }else{
+                        throw new Exception("Unauthorized");
+                    }
+                    syncResult.stats.numAuthExceptions++;
+                } else {
+                    throw new RESTApiException(response.message());
+                }
+            }while ( retry );
 
             mSyncDispatcher.sendSyncFinish();
         }catch (SQLException ex){

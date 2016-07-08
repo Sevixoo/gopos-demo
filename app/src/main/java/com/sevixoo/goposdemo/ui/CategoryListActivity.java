@@ -106,10 +106,7 @@ public class CategoryListActivity extends AppCompatActivity implements ISyncRece
             }
         });
 
-        if(savedInstanceState==null){
-            mCategoryPresenter.checkLogin();
-        }
-
+        mCategoryPresenter.checkLogin();
     }
 
     @Override
@@ -124,6 +121,15 @@ public class CategoryListActivity extends AppCompatActivity implements ISyncRece
         switch (item.getItemId()) {
             case R.id.logout:
                 mCategoryPresenter.onClickLogout();
+                return true;
+            case R.id.clear_data:
+                //
+                return true;
+            case R.id.load_data:
+                mCategoryPresenter.loadCategories(0);
+                return true;
+            case R.id.sync:
+                mSyncHelper.requestSync();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -16,6 +16,9 @@ public class CategoryListItem {
         this.imagePath = imagePath;
     }
 
+    public CategoryListItem () {
+    }
+
     public String getName() {
         return name;
     }

@@ -1,5 +1,7 @@
 package com.sevixoo.goposdemo.data.repository;
 
+import android.util.Log;
+
 import com.j256.ormlite.dao.Dao;
 import com.sevixoo.goposdemo.data.GoPOSDatabaseHelper;
 import com.sevixoo.goposdemo.data.entity.CategoryEntity;
@@ -29,18 +31,24 @@ public class CategoriesRepository implements ICategoriesRepository {
     public void insert(CategoryItem item)throws SQLException {
         mDao = mGoPOSDatabaseHelper.getDao();
         mDao.createOrUpdate( mMapper.transform(item) );
+        Log.e( "insert" , "size" + mDao.countOf() );
     }
 
     @Override
     public CategoryItem load(long _id)throws SQLException {
-        return null;
+        mDao = mGoPOSDatabaseHelper.getDao();
+        CategoryEntity entity = mDao.queryBuilder().where().eq("_id",_id).queryForFirst();
+        if(entity==null){
+            return null;
+        }
+        return mMapper.transform(entity);
     }
 
     @Override
     public List<CategoryItem> list(int offset, int limit) throws SQLException{
         mDao = mGoPOSDatabaseHelper.getDao();
         List<CategoryItem> data = new ArrayList<>();
-        List<CategoryEntity> entities = mDao.queryBuilder().limit((long)offset).offset((long)limit).query();
+        List<CategoryEntity> entities = mDao.queryBuilder().limit((long)limit).offset((long)offset).query();
         if(entities==null)return null;
         for (CategoryEntity entity : entities){
             data.add(mMapper.transform(entity));
@@ -64,5 +72,15 @@ public class CategoriesRepository implements ICategoriesRepository {
     public boolean exists(CategoryItem item) throws SQLException {
         mDao = mGoPOSDatabaseHelper.getDao();
         return mDao.idExists(item.getID());
+    }
+
+    @Override
+    public CategoryItem getByRemoteID(int remoteID) throws SQLException {
+        mDao = mGoPOSDatabaseHelper.getDao();
+        CategoryEntity data = mDao.queryBuilder().where().eq("remoteId",remoteID).queryForFirst();
+        if(data==null){
+            return null;
+        }
+        return mMapper.transform( data );
     }
 }

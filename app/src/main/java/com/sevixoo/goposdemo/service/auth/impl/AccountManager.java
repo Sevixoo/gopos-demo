@@ -182,14 +182,27 @@ public class AccountManager implements IAccountManager {
     }
 
     @Override
+    public String invalidateAuthTokenBlocking(String authTokenType) {
+        try {
+            Account[] accounts = mAccountManager.getAccountsByType(mAccountConfig.getAccountType());
+            Account account = accounts[0];
+            final AccountManagerFuture<Bundle> future =
+                    mAccountManager.getAuthToken(account, authTokenType, null, true, null, null);
+
+            Bundle bnd = future.getResult();
+            final String authtoken = bnd.getString(android.accounts.AccountManager.KEY_AUTHTOKEN);
+            mAccountManager.invalidateAuthToken(account.type, authtoken);
+            return authtoken;
+        }catch (Exception ex){
+            return null;
+        }
+    }
+
+    @Override
     public String getAuthTokenBlocking(String authTokenType)throws Exception {
         Account[] accounts = mAccountManager.getAccountsByType( mAccountConfig.getAccountType() );
         Account account = accounts[0];
-        final AccountManagerFuture<Bundle> future =
-                mAccountManager.getAuthToken(account, authTokenType, null, true, null, null);
-
-        Bundle bnd = future.getResult();
-        final String authtoken = bnd.getString(android.accounts.AccountManager.KEY_AUTHTOKEN);
+        final String authtoken =  mAccountManager.blockingGetAuthToken( account, authTokenType , true  );
         if(TextUtils.isEmpty(authtoken)){
             return null;
         }else {

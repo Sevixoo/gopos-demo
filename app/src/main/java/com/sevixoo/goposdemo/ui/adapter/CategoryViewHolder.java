@@ -1,6 +1,7 @@
 package com.sevixoo.goposdemo.ui.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -35,8 +36,9 @@ public class CategoryViewHolder extends BaseViewHolder<CategoryListItem> {
     @Override
     public void onBindItem(CategoryListItem item) {
         mTitleView.setText(item.getName());
+        Log.e("getImagePath" , mBaseUrl + item.getImagePath());
         Picasso.with(mImageView.getContext())
-                .load( mBaseUrl + item.getImagePath() )
+                .load( mBaseUrl + "/" + item.getImagePath() )
                 .placeholder(R.drawable.photo_placeholder)
                 .into(mImageView);
     }

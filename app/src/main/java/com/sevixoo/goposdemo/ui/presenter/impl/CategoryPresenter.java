@@ -6,6 +6,7 @@ import com.sevixoo.goposdemo.domain.DefaultSubscriber;
 import com.sevixoo.goposdemo.domain.entity.CategoryListItem;
 import com.sevixoo.goposdemo.domain.interactor.CheckAuthorizationInteractor;
 import com.sevixoo.goposdemo.domain.interactor.DeleteAccountInteractor;
+import com.sevixoo.goposdemo.domain.interactor.LoadCategoriesInteractor;
 import com.sevixoo.goposdemo.service.auth.impl.AccountConfig;
 import com.sevixoo.goposdemo.ui.presenter.ICategoryPresenter;
 import com.sevixoo.goposdemo.ui.view.ICategoryView;
@@ -22,11 +23,13 @@ public class CategoryPresenter implements ICategoryPresenter {
     CheckAuthorizationInteractor        mCheckAuthorizationInteractor;
     DeleteAccountInteractor             mDeleteAccountInteractor;
     AccountConfig                       mAccountConfig;
+    LoadCategoriesInteractor            mLoadCategoriesInteractor;
 
-    public CategoryPresenter( AccountConfig accountConfig,DeleteAccountInteractor deleteAccountInteractor, CheckAuthorizationInteractor checkAuthorizationInteractor) {
+    public CategoryPresenter( AccountConfig accountConfig,LoadCategoriesInteractor loadCategoriesInteractor , DeleteAccountInteractor deleteAccountInteractor, CheckAuthorizationInteractor checkAuthorizationInteractor) {
         mCheckAuthorizationInteractor = checkAuthorizationInteractor;
         mDeleteAccountInteractor = deleteAccountInteractor;
         mAccountConfig = accountConfig;
+        mLoadCategoriesInteractor = loadCategoriesInteractor;
     }
 
     @Override
@@ -66,14 +69,19 @@ public class CategoryPresenter implements ICategoryPresenter {
 
     @Override
     public void loadCategories(int offset) {
-        List<CategoryListItem> items = new ArrayList<>();
-        items.add( new CategoryListItem("AAA","","") );
-        items.add( new CategoryListItem("BBB","","") );
-        items.add( new CategoryListItem("CCC","","") );
-        items.add( new CategoryListItem("DDD","","") );
-        items.add( new CategoryListItem("EEE","","") );
-        mCategoryView.onItemsLoaded(items);
+        mLoadCategoriesInteractor.execute(  offset , 30 , new LoadCategoriesSubscriber() );
     }
+
+    private class LoadCategoriesSubscriber extends DefaultSubscriber<List<CategoryListItem>>{
+        @Override
+        public void onNext(List<CategoryListItem> list) {
+            mCategoryView.onItemsLoaded(list);
+        }
+        @Override
+        public void onError(Throwable e) {
+            mCategoryView.displayError(e.getMessage());
+        }
+    };
 
     private class LogoutSubscriber extends DefaultSubscriber<String>{
         @Override
